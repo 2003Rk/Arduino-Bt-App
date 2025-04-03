@@ -2,7 +2,7 @@
 
 ## 📥 Download & Install
 📥 Click below to download the latest APK:  
-📥 **[Download APK](https://github.com/2003Rk/ArduinoCarController/releases/download/v1.0.0/app-release.apk)**
+📥 **[Download APK](https://github.com/2003Rk/Arduino-Bt-App/releases/download/v1.0.0/app-release.apk)**
 
 Welcome to my **Arduino Car Controller App**, built using **Flutter**, enabling users to control an **Arduino-powered RC car** via **Bluetooth (HC-05 Module)** and receive **real-time sensor data** (such as **distance, speed, and temperature**) directly in the app.
 
@@ -35,7 +35,7 @@ Welcome to my **Arduino Car Controller App**, built using **Flutter**, enabling 
 
 You can download the latest APK version of **FOOD DEL** below:
 
-[Download APK](https://github.com/2003Rk/foodDel/releases/download/v1.0.0/app-release.apk)
+[Download APK](https://github.com/2003Rk/Arduino-Bt-App/releases/download/v1.0.0/app-release.apk)
 
 ## 📸 Screenshots
 
