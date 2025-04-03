@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data'; // For Uint8List
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart'; // For InAppWebView
 import 'package:permission_handler/permission_handler.dart'; // Permission handler for Android 12+
 
 void main() {
@@ -40,8 +39,6 @@ class _MyHomePageState extends State<MyHomePage> {
   String airQualityValue = 'N/A';
   String temperatureValue = 'N/A';
   String humidityValue = 'N/A';
-
-  InAppWebViewController? webViewController; // InAppWebView controller
 
   @override
   void initState() {
@@ -125,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // Listen for data from Arduino
       connection!.input!.listen((Uint8List data) {
         String receivedData = String.fromCharCodes(data).trim();
-        print('Received data: $receivedData'); // Debugging: print received data
+        print('Received data: $receivedData');
         _parseSensorData(receivedData);
       }).onDone(() {
         setState(() {
@@ -170,10 +167,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _scanDevices() async {
     setState(() {
-      _devicesList.clear(); // Clear the list before scanning
+      _devicesList.clear();
     });
 
-    // Start the device discovery and listen to the stream of discovered devices
     FlutterBluetoothSerial.instance.startDiscovery().listen((event) {
       if (event.device != null) {
         setState(() {
@@ -201,140 +197,288 @@ class _MyHomePageState extends State<MyHomePage> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black87,
+        elevation: 10,
+        shadowColor: Colors.blueAccent.withOpacity(0.5),
       ),
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image:
-                AssetImage("assets/images/img1.jpg"), // Gaming-style background
-            fit: BoxFit.cover,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.black87,
+              Colors.blueGrey.shade900,
+            ],
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            if (!isConnected) ...[
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  backgroundColor: Colors.blueAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              if (!isConnected) ...[
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      backgroundColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      elevation: 8,
+                      shadowColor: Colors.blueAccent.withOpacity(0.5),
+                    ),
+                    onPressed: _scanDevices,
+                    child: Text(
+                      'SCAN DEVICES',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
                   ),
-                  elevation: 10,
-                  shadowColor: Colors.blueAccent.withOpacity(0.5),
                 ),
-                onPressed: _scanDevices,
-                child: Text(
-                  'Scan for Devices',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              if (_devicesList.isNotEmpty)
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _devicesList.length,
-                    itemBuilder: (context, index) {
-                      BluetoothDevice device = _devicesList[index];
-                      return ListTile(
-                        title: Text(
-                          device.name ?? 'Unknown device',
-                          style: TextStyle(color: Colors.white),
+                if (_devicesList.isNotEmpty)
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: Colors.blueAccent.withOpacity(0.5),
+                          width: 1,
                         ),
-                        subtitle: Text(device.address,
-                            style: TextStyle(color: Colors.white54)),
-                        onTap: () {
-                          setState(() {
-                            _selectedDevice = device;
-                          });
-                        },
-                        trailing: _selectedDevice == device
-                            ? Icon(Icons.check, color: Colors.green)
-                            : null,
-                      );
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: ListView.builder(
+                          itemCount: _devicesList.length,
+                          itemBuilder: (context, index) {
+                            BluetoothDevice device = _devicesList[index];
+                            return Container(
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 4, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: _selectedDevice == device
+                                    ? Colors.blueAccent.withOpacity(0.2)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _selectedDevice == device
+                                      ? Colors.blueAccent
+                                      : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: ListTile(
+                                leading: Icon(
+                                  Icons.bluetooth,
+                                  color: Colors.blueAccent,
+                                ),
+                                title: Text(
+                                  device.name ?? 'Unknown device',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  device.address,
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                                trailing: _selectedDevice == device
+                                    ? Container(
+                                        width: 24,
+                                        height: 24,
+                                        decoration: BoxDecoration(
+                                          color: Colors.blueAccent,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.check,
+                                          size: 16,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : null,
+                                onTap: () {
+                                  setState(() {
+                                    _selectedDevice = device;
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      backgroundColor: _selectedDevice != null
+                          ? Colors.blueAccent
+                          : Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      elevation: 8,
+                      shadowColor: Colors.blueAccent.withOpacity(0.5),
+                    ),
+                    onPressed: () {
+                      if (_selectedDevice != null) {
+                        _connectToDevice(_selectedDevice!);
+                      }
                     },
+                    child: Text(
+                      'CONNECT TO DEVICE',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
                   ),
                 ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  backgroundColor: Colors.blueAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+              ],
+              if (isConnected) ...[
+                Container(
+                  padding: EdgeInsets.all(16),
+                  margin: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: Colors.blueAccent.withOpacity(0.5),
+                      width: 1,
+                    ),
                   ),
-                  elevation: 10,
-                  shadowColor: Colors.blueAccent.withOpacity(0.5),
-                ),
-                onPressed: () {
-                  if (_selectedDevice != null) {
-                    _connectToDevice(_selectedDevice!);
-                  }
-                },
-                child: Text(
-                  'Connect to Selected Device',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-            if (isConnected) ...[
-              Center(
-                child: Text(
-                  'Connected to ${_selectedDevice?.name}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                  child: Column(
+                    children: [
+                      Text(
+                        'Connected to ${_selectedDevice?.name}',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      _buildSensorCard(
+                          'Air Quality', airQualityValue, Icons.air),
+                      _buildSensorCard(
+                          'Temperature', temperatureValue, Icons.thermostat),
+                      _buildSensorCard(
+                          'Humidity', humidityValue, Icons.water_drop),
+                    ],
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-              Text('Air Quality: $airQualityValue',
-                  style: TextStyle(color: Colors.white)),
-              Text('Temperature: $temperatureValue',
-                  style: TextStyle(color: Colors.white)),
-              Text('Humidity: $humidityValue',
-                  style: TextStyle(color: Colors.white)),
-              SizedBox(height: 20),
-              // WebView for camera feed
-              Container(
-                height: 300, // Set a height for the web view
-                child: InAppWebView(
-                  initialUrlRequest:
-                      URLRequest(url: Uri.parse('http://your_camera_feed_url')),
-                  initialOptions: InAppWebViewGroupOptions(
-                    crossPlatform: InAppWebViewOptions(),
+                SizedBox(height: 20),
+                // Control buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    _customIconButton(Icons.arrow_upward, 'F', 'S'), // Forward
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    _customIconButton(Icons.arrow_back, 'L', 'S'), // Left
+                    SizedBox(width: 20),
+                    _customIconButton(Icons.stop, 'S', 'S'), // Stop
+                    SizedBox(width: 20),
+                    _customIconButton(Icons.arrow_forward, 'R', 'S'), // Right
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    _customIconButton(
+                        Icons.arrow_downward, 'B', 'S'), // Backward
+                  ],
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    backgroundColor: Colors.redAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    elevation: 8,
                   ),
-                  onWebViewCreated: (InAppWebViewController controller) {
-                    webViewController = controller;
+                  onPressed: () {
+                    if (connection != null) {
+                      connection!.close();
+                      setState(() {
+                        isConnected = false;
+                        _selectedDevice = null;
+                      });
+                    }
                   },
+                  child: Text(
+                    'DISCONNECT',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSensorCard(String title, String value, IconData icon) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(12),
+      margin: EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.blueAccent.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.blueAccent, size: 28),
+          SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
                 ),
               ),
-              SizedBox(height: 20),
-              // Control buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  _customIconButton(Icons.arrow_upward, 'F', 'S'), // Forward
-                ],
+              Text(
+                value,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  _customIconButton(Icons.arrow_back, 'L', 'S'), // Left
-                  _customIconButton(Icons.stop, 'S', 'S'), // Stop
-                  _customIconButton(Icons.arrow_forward, 'R', 'S'), // Right
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  _customIconButton(Icons.arrow_downward, 'B', 'S'), // Backward
-                ],
-              ),
-              SizedBox(height: 10),
             ],
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -345,56 +489,31 @@ class _MyHomePageState extends State<MyHomePage> {
       onTapDown: (_) => _sendCommand(commandDown),
       onTapUp: (_) => _sendCommand(commandUp),
       child: Container(
-        padding: EdgeInsets.all(20), // Increased padding for a bigger button
+        margin: EdgeInsets.all(8),
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: LinearGradient(
-            colors: [Colors.purpleAccent, Colors.blueAccent], // Bright gradient
+            colors: [Colors.blueAccent.shade400, Colors.blueAccent.shade700],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.blueAccent.withOpacity(0.7),
-              blurRadius: 15,
-              spreadRadius: 3,
-              offset: Offset(0, 5), // Adds depth with an offset shadow
+              color: Colors.blueAccent.withOpacity(0.5),
+              blurRadius: 10,
+              spreadRadius: 2,
+              offset: Offset(0, 4),
             ),
           ],
-          border: Border.all(
-            color: Colors.white.withOpacity(0.8), // White border for contrast
-            width: 2,
-          ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.white), // Direction arrow
-            SizedBox(height: 5),
-            Text(
-              _getDirectionLabel(commandDown), // Adding direction text
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ],
+        child: Icon(
+          icon,
+          size: 36,
+          color: Colors.white,
         ),
       ),
     );
-  }
-
-  String _getDirectionLabel(String command) {
-    switch (command) {
-      case 'F':
-        return 'Forward';
-      case 'B':
-        return 'Backward';
-      case 'L':
-        return 'Left';
-      case 'R':
-        return 'Right';
-      default:
-        return '';
-    }
   }
 }
 
