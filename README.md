@@ -33,13 +33,13 @@ Welcome to my **Arduino Car Controller App**, built using **Flutter**, enabling 
 ---
 ## APK Download 📲
 
-You can download the latest APK version of **FOOD DEL** below:
+You can download the latest APK version of ** ARDUINO BT CAR CONTROLLER APP ** below:
 
 [Download APK](https://github.com/2003Rk/Arduino-Bt-App/releases/download/v1.0.0/app-release.apk)
 
 ## 📸 Screenshots
 
-Here’s a glimpse of the FOOD DEL app in action:
+Here’s a glimpse of the ARDUINO BT CAR CONTROLLER APP in action:
 
 <table align="center">
   <tr>
